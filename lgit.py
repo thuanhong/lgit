@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-#hexdigest()
 import os
 from hashlib import sha1
 from argparse import ArgumentParser
 
 
-def write_logname(name_file, write_content):
+def write_file(name_file, content):
     file = open(name_file, 'w')
     file.write(content)
     file.close()
@@ -16,8 +15,8 @@ def create_init():
     os.mkdir('.lgit/commits')
     os.mkdir('.lgit/object')
     os.mkdir('.lgit/snapshots')
-    write_logname('.lgit/config', os.environ['LOGNAME'])
-    write_logname('.lgit/index', '')
+    write_file('.lgit/config', os.environ['LOGNAME'])
+    write_file('.lgit/index', '')
 
 
 def take_argument():
@@ -28,7 +27,7 @@ def take_argument():
 
 
 def handle_init():
-    if os.path.exist('.lgit'):
+    if os.path.exists('.lgit'):
         if os.path.isfile('.lgit'):
             os.unlink('.lgit')
             create_init()
@@ -37,8 +36,8 @@ def handle_init():
 
 
 def fatal_error():
-    if not os.path.exist('.lgit'):
-        print("Reinitialized existing Git repository in " + os.getcwd())\
+    if not os.path.exists('.lgit'):
+        print("Reinitialized existing Git repository in " + os.getcwd())
         return True
     return False
 
@@ -48,13 +47,15 @@ def handle_add(list_file):
         return
     for file in list_file:
         try:
-            file = open(file, 'rb')
+            file = open(file, 'r')
         except:
             print('fatal: pathspec ' + file + ' did not match any files')
             return
-        code_sha1 = sha1(file.read()).hexdigest()
-        os.mkdir(.lgit/object/code_sha1[:2])
-        
+        content = file.read()
+        code_sha1 = sha1(content.encode()).hexdigest()
+        print(content)
+        os.makedirs('.lgit/object/' + code_sha1[:2])
+        write_file('.lgit/object/' + code_sha1[:2] + '/' + code_sha1[2:], content)
 
 
 if __name__ == "__main__":
