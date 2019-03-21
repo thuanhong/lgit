@@ -33,18 +33,6 @@ def create_lgit():
     write_file('.lgit/index', '', 'w')
 
 
-def take_argument():
-    """
-    take agument (like : add, init, status, ...)
-    @param None
-    @return a object contain argument
-    """
-    parser = ArgumentParser()
-    parser.add_argument("command", help="input command need execute")
-    parser.add_argument("file", nargs="*", help="add file need handle")
-    return parser.parse_args()
-
-
 def handle_init():
     """
     handle command init
@@ -132,7 +120,7 @@ def update_index(file_name, sha1):
             # rewrite only the line have file name
             # replace old SHA1 by new SHA1
             write_line = os.open('.lgit/index', os.O_RDWR)
-            os.lseek(write_line, pos_pointer*142, 0)
+            os.lseek(write_line, pos_pointer*143, 0)
             content = "{} {} {}".format(str_time, sha1, sha1)
             os.write(write_line, content.encode())
             os.close(write_line)
@@ -145,6 +133,13 @@ def update_index(file_name, sha1):
         write_file('.lgit/index', content, 'a')
 
 
+def get_sha1(file_name):
+    file = open(file_name, 'r')
+    code_sha1 = sha1(file.read().encode()).hexdigest()
+    file.close()
+    return code_sha1
+
+
 def handle_commit(message):
     new_file = datetime.now().strftime("%Y%m%d%H%M%S.%s")
     file_commits = '.lgit/commits/{}'.format(new_file)
@@ -152,17 +147,42 @@ def handle_commit(message):
 
     content = os.environ['LOGNAME'] + '\n'
     content += datetime.now().strftime("%Y%m%d%H%M%S") + '\n'
-    content += '\n' + message '\n'
-    write_file(file_commit, content, 'w')
+    content += '\n' + message + '\n'
+    write_file(file_commits, content, 'w')
 
     file_index = open('.lgit/index', 'r')
     file_snapshots = open(file_snap, 'w')
     for pos_pointer, line in enumerate(file_index.readlines()):
         line = line.split()
-        file.file_snapshots.write(*line[-2:] + '\n')
+
+        sha1_work = get_sha1(line[-1])
+        str_time = datetime.now().strftime("%Y%m%d%H%M%S")
+
+        write_line = os.open('.lgit/index', os.O_RDWR)
+        os.lseek(write_line, pos_pointer*143, 0)
+
+        content = "{} {} {} {}".format(str_time, sha1_work, line[2], line[2])
+        os.write(write_line, content.encode())
+        os.close(write_line)
+
+        file_snapshots.write(" ".join(line[-2:]) + '\n')
+
+
     file_index.close()
     file_snapshots.close()
 
+
+def take_argument():
+    """
+    take agument (like : add, init, status, ...)
+    @param None
+    @return a object contain argument
+    """
+    parser = ArgumentParser()
+    parser.add_argument("command", help="input command need execute")
+    parser.add_argument("file", nargs="*", help="add file need handle")
+    parser.add_argument("-m", type=str, help="commit message")
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
