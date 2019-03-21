@@ -99,7 +99,7 @@ def get_timestamp(file_name):
     """
     get last modify time of file or directory
     @param file_name : name of file or directory
-    @return timestamps of file 
+    @return timestamps of file
     """
     mod_time = os.stat(file_name).st_mtime
     return datetime.fromtimestamp(mod_time).strftime("%Y%m%d%H%M%S")
@@ -139,14 +139,30 @@ def update_index(file_name, sha1):
             file.close()
             return
     else:
-    # append new value to the end file if the SHA1 of file not exist
+    # append new value to the end file if the file haven't been written
         file.close()
         content = '{} {} {} {} {}\n'.format(str_time, sha1, sha1, " "*40, file_name)
         write_file('.lgit/index', content, 'a')
 
 
-def handle_commit():
-    pass
+def handle_commit(message):
+    new_file = datetime.now().strftime("%Y%m%d%H%M%S.%s")
+    file_commits = '.lgit/commits/{}'.format(new_file)
+    file_snap = '.lgit/snapshots/{}'.format(new_file)
+
+    content = os.environ['LOGNAME'] + '\n'
+    content += datetime.now().strftime("%Y%m%d%H%M%S") + '\n'
+    content += '\n' + message '\n'
+    write_file(file_commit, content, 'w')
+
+    file_index = open('.lgit/index', 'r')
+    file_snapshots = open(file_snap, 'w')
+    for pos_pointer, line in enumerate(file_index.readlines()):
+        line = line.split()
+        file.file_snapshots.write(*line[-2:] + '\n')
+    file_index.close()
+    file_snapshots.close()
+
 
 
 if __name__ == "__main__":
@@ -158,4 +174,4 @@ if __name__ == "__main__":
     elif args.command == 'status':
         pass
     elif args.command == 'commit':
-        handle_commit()
+        handle_commit(args.m)
