@@ -5,6 +5,8 @@ from datetime import datetime
 from argparse import ArgumentParser
 from add import add
 from commits import commits
+from log import log
+from remove import rm
 from utility import *
 
 
@@ -35,17 +37,17 @@ def init():
         create_lgit()
 
 
-def add_recursive(list_add):
+def add_recursive(list_add ,dir=''):
     '''
     handle recursive when add directory and more
-    @param list_add : all file or folder need add
+    @param list_add : all file need add
     @return None
     '''
     for element in list_add:
-        if os.path.isdir(element):
-            add_recursive(os.listdir(element))
+        if os.path.isdir(dir + element):
+            add_recursive(os.listdir(dir + element), dir + element + '/')
         else:
-            add(element)
+            add(dir + element)
 
 
 def take_argument():
@@ -71,3 +73,7 @@ if __name__ == "__main__":
         pass
     elif args.command == 'commit':
         commits(args.m)
+    elif args.command == 'log':
+        log()
+    elif args.command == 'rm':
+        rm(args.file[0])

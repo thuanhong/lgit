@@ -22,19 +22,22 @@ def commits(message):
 
     file_index = open('.lgit/index', 'r')
     file_snapshots = open(file_snap, 'w')
+
+    write_line = os.open('.lgit/index', os.O_RDWR)
+    pos = 0
+    os.lseek(write_line, 0, 0)
     for pos_pointer, line in enumerate(file_index.readlines()):
-        line = line.split()
+        list_index = line.split()
 
-        sha1_work = get_sha1(line[-1])
+        sha1_work = get_sha1(list_index[-1])
         str_time = datetime.now().strftime("%Y%m%d%H%M%S")
-        content = "{} {} {} {}".format(str_time, sha1_work, line[2], line[2])
-
-        write_line = os.open('.lgit/index', os.O_RDWR)
-        os.lseek(write_line, pos_pointer*143, 0)
+        content = "{} {} {} {}".format(str_time, sha1_work, list_index[2], list_index[2])
         os.write(write_line, content.encode())
-        os.close(write_line)
+        pos += len(line)
+        os.lseek(write_line, pos, 0)
 
-        file_snapshots.write(" ".join(line[-2:]) + '\n')
-
+        file_snapshots.write(" ".join(list_index[-2:]) + '\n')
+    
+    os.close(write_line)
     file_index.close()
     file_snapshots.close()

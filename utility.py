@@ -49,3 +49,19 @@ def get_sha1(file_name):
     code_sha1 = sha1(file.read().encode()).hexdigest()
     file.close()
     return code_sha1
+
+
+def check_file(file_name):
+    if not os.path.exists(get_path(file_name)):
+        print('fatal: pathspec ' + file_name + ' did not match any files')
+        return True
+    return False
+
+
+def get_path(file_name):
+    file_path = os.path.realpath(file_name).split('/')
+    try:
+        start = file_path.index('lgit') + 1
+        return "/".join(file_path[start:])
+    except IndexError:
+        return file_name

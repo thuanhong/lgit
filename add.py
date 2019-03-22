@@ -11,14 +11,9 @@ def add(file_name):
     @param list_file : all file need add
     @return output error (if possible)
     """
-    if fatal_error():
+    if fatal_error() or check_file(file_name):
         return
-
-    try:
-        file = open(file_name, 'r')
-    except:
-        print('fatal: pathspec ' + file_name + ' did not match any files')
-        return
+    file = open(file_name, 'r')
     content = file.read()
     code_sha1 = sha1(content.encode()).hexdigest()
     os.makedirs('.lgit/object/' + code_sha1[:2], exist_ok=True)
@@ -49,17 +44,20 @@ def update_index(file_name, sha1):
 
     # write value hash SHA1 when execute add or commit
     file = open('.lgit/index', 'r')
+    write_line = os.open('.lgit/index', os.O_RDWR)
+    pos = 0
+    os.lseek(write_line, pos, 0)
     for pos_pointer, line in enumerate(file.readlines()):
         if file_name in line:
             # rewrite only the line have file name
             # replace old SHA1 by new SHA1
-            write_line = os.open('.lgit/index', os.O_RDWR)
-            os.lseek(write_line, pos_pointer*143, 0)
             content = "{} {} {}".format(str_time, sha1, sha1)
             os.write(write_line, content.encode())
             os.close(write_line)
             file.close()
             return
+        pos += len(line)
+        os.lseek(write_line, pos, 0)
     else:
     # append new value to the end file if the file haven't been written
         file.close()
