@@ -8,6 +8,7 @@ from commits import commits
 from log import log
 from remove import rm
 from utility import *
+from ls_file import ls_file
 
 
 def create_lgit():
@@ -17,10 +18,10 @@ def create_lgit():
     @param None
     @return None
     """
-    os.mkdir('.lgit')
-    os.mkdir('.lgit/commits')
-    os.mkdir('.lgit/object')
-    os.mkdir('.lgit/snapshots')
+    os.makedirs('.lgit', exist_ok=True)
+    os.makedirs('.lgit/commits', exist_ok=True)
+    os.makedirs('.lgit/object', exist_ok=True)
+    os.makedirs('.lgit/snapshots', exist_ok=True)
     write_file('.lgit/config', os.environ['LOGNAME'], 'w')
     write_file('.lgit/index', '', 'w')
 
@@ -37,17 +38,12 @@ def init():
         create_lgit()
 
 
-def add_recursive(list_add ,dir=''):
-    '''
-    handle recursive when add directory and more
-    @param list_add : all file need add
-    @return None
-    '''
-    for element in list_add:
-        if os.path.isdir(dir + element):
-            add_recursive(os.listdir(dir + element), dir + element + '/')
-        else:
-            add(dir + element)
+def handle_add():
+    list_path = []
+    get_path_recursive(list_path, args.file)
+    set_path(__file__)
+    for x in list_path:
+        add(x)
 
 
 def take_argument():
@@ -68,7 +64,7 @@ if __name__ == "__main__":
     if args.command == 'init':
         init()
     elif args.command == 'add':
-        add_recursive(args.file)
+        handle_add()
     elif args.command == 'status':
         pass
     elif args.command == 'commit':
@@ -77,3 +73,5 @@ if __name__ == "__main__":
         log()
     elif args.command == 'rm':
         rm(args.file[0])
+    elif args.command == 'ls-file':
+        ls_file()

@@ -9,8 +9,9 @@ def commits(message):
     @param message : commit message
     @return None
     """
-    if fatal_error():
-        return
+    set_path(__file__)
+    fatal_error()
+
     new_file = datetime.now().strftime("%Y%m%d%H%M%S.%s")
     file_commits = '.lgit/commits/{}'.format(new_file)
     file_snap = '.lgit/snapshots/{}'.format(new_file)

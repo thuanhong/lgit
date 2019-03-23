@@ -3,6 +3,10 @@ from hashlib import sha1
 from datetime import datetime
 
 
+def set_path(file):
+    os.chdir(os.path.dirname(os.path.realpath(file)))
+
+
 def write_file(name_file, content, mode):
     """
     write content into file
@@ -23,10 +27,11 @@ def fatal_error():
     @param None
     @return True if lgit have a fatal error, otherwise return False
     """
-    if not os.path.exists('.lgit'):
-        print("Reinitialized existing Git repository in " + os.getcwd())
-        return True
-    return False
+    path = os.path.dirname(os.path.realpath(__file__)) + '/.lgit'
+    if not os.path.exists(path):
+        print("fatal: not a git repository (or any of the parent directories)")
+        quit()
+
 
 
 def get_timestamp(file_name):
@@ -52,10 +57,9 @@ def get_sha1(file_name):
 
 
 def check_file(file_name):
-    if not os.path.exists(get_path(file_name)):
-        print('fatal: pathspec ' + file_name + ' did not match any files')
-        return True
-    return False
+    if not os.path.exists(file_name):
+        print("fatal: pathspec '" + file_name + "' did not match any files")
+        quit()
 
 
 def get_path(file_name):
@@ -65,3 +69,17 @@ def get_path(file_name):
         return "/".join(file_path[start:])
     except IndexError:
         return file_name
+
+
+def get_path_recursive(list_path, list_add ,dir=''):
+    '''
+    handle recursive when add directory and more
+    @param list_add : all file need add
+    @return None
+    '''
+    for element in list_add:
+        element = dir + element
+        if os.path.isdir(element):
+            get_path_recursive(list_path, os.listdir(element), element + '/')
+        else:
+            list_path.append(get_path(element))

@@ -11,8 +11,9 @@ def add(file_name):
     @param list_file : all file need add
     @return output error (if possible)
     """
-    if fatal_error() or check_file(file_name):
-        return
+    fatal_error()
+    check_file(file_name)
+
     file = open(file_name, 'r')
     content = file.read()
     code_sha1 = sha1(content.encode()).hexdigest()

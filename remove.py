@@ -1,15 +1,17 @@
 from os import unlink
-from utility import check_file, get_path
+import os
+from utility import check_file, get_path, set_path
 
 
 def rm(file_name):
-    if check_file(file_name):
-        return
+    check_file(file_name)
+
     file_name = get_path(file_name)
+    set_path(__file__)
     file = open('.lgit/index', 'r')
     output = []
     for line in file:
-        if not line.endswith(file_name + '\n'):
+        if line.split()[-1] != file_name:
             output.append(line)
     file.close()
     file = open('.lgit/index', 'w')

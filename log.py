@@ -1,5 +1,6 @@
 from os import listdir, stat
 from time import ctime
+from utility import set_path
 
 
 def log():
@@ -10,8 +11,9 @@ def log():
     @return None
     """
     # get all file commit in folder commits
+    set_path(__file__)
     list_file = listdir('.lgit/commits')
-    for file_commit in list_file:
+    for file_commit in list_file[::-1]:
         file = open('.lgit/commits/' + file_commit, 'r')
         # Read each line of the file as a list
         list_content = file.readlines()
